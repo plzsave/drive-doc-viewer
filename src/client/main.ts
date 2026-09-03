@@ -112,7 +112,7 @@ function schedulePreviewResize(): void {
 function setOpenPanel(visible: boolean, focusInput = false): void {
   openCard.classList.toggle("hidden", !visible);
   openPanelToggle.setAttribute("aria-expanded", String(visible));
-  openPanelToggle.textContent = visible ? "入力欄を隠す" : "別のファイルを開く";
+  openPanelToggle.textContent = visible ? "指定欄を隠す" : "別のドキュメントを開く";
   if (visible && focusInput) window.requestAnimationFrame(() => urlInput.focus());
   schedulePreviewResize();
 }
@@ -126,8 +126,8 @@ function syncThemeControls(dark: boolean): void {
   highlightLight.disabled = dark;
   highlightDark.disabled = !dark;
   themeIcon.textContent = dark ? "☀" : "☾";
-  themeLabel.textContent = dark ? "ライト" : "ダーク";
-  const action = dark ? "ライトモードに切り替える" : "ダークモードに切り替える";
+  themeLabel.textContent = dark ? "文書: ライト" : "文書: ダーク";
+  const action = dark ? "文書をライト表示に切り替える" : "文書をダーク表示に切り替える";
   themeToggle.setAttribute("aria-label", action);
   themeToggle.title = action;
 }
@@ -250,18 +250,18 @@ copyLinkButton.addEventListener("click", async () => {
 
 async function openDocument(request: { input?: string; id?: string; resourceKey?: string }): Promise<void> {
   if (!request.id && !String(request.input || "").trim()) {
-    showMessage("Google DriveのファイルURLを入力してください。", "error");
+    showMessage("Google Driveの共有URLまたはファイルIDを入力してください。", "error");
     return;
   }
 
   setBusy(true);
-  showMessage("Driveからファイルを読み込んでいます…", "loading");
+  showMessage("Driveからドキュメントを読み込んでいます…", "loading");
   try {
     const opened = await gasRun<OpenedDocument>("openDriveDocument", request);
     currentDocument = opened;
     fileName.textContent = opened.name;
-    fileDetail.textContent = `更新: ${new Date(opened.lastUpdated).toLocaleString("ja-JP")}`;
-    typeBadge.textContent = opened.kind === "markdown" ? "Markdown" : "HTML";
+    fileDetail.textContent = `最終更新 ${new Date(opened.lastUpdated).toLocaleString("ja-JP")}`;
+    typeBadge.textContent = opened.kind === "markdown" ? "MARKDOWN" : "HTML";
     viewer.classList.add("visible");
     viewerBody.replaceChildren();
     activeHtmlPreview = null;
