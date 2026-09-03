@@ -51,7 +51,7 @@ function messageOf(error: unknown): string {
 
 function parseDriveInput(input: string): { id: string; resourceKey: string } {
   const value = String(input || "").trim();
-  if (!value) throw new Error("Google DriveのファイルURLを入力してください。");
+  if (!value) throw new Error("Google Driveの共有URLまたはファイルIDを入力してください。");
 
   if (/^[A-Za-z0-9_-]{10,}$/.test(value)) {
     return { id: value, resourceKey: "" };
@@ -262,5 +262,5 @@ export function doGet(event: GoogleAppsScript.Events.DoGet): GoogleAppsScript.HT
   (template as unknown as { initialRequestJson: string }).initialRequestJson =
     safeJsonForHtml(parseInitialRequest(event));
   return template.evaluate()
-    .setTitle("Drive Doc Viewer");
+    .setTitle("Drive Doc Viewer — Drive文書の閲覧台");
 }
