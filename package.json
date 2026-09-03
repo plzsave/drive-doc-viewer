@@ -1,0 +1,22 @@
+{
+  "name": "drive-doc-viewer",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "vite build && bun run scripts/inline-js.ts",
+    "check": "tsc -p tsconfig.json && tsc -p src/client/tsconfig.json",
+    "push": "bun run build && bun run clasp:push",
+    "clasp:login": "clasp login",
+    "clasp:create": "clasp create --type standalone --title drive-doc-viewer --rootDir dist",
+    "clasp:push": "clasp push",
+    "clasp:open": "clasp open"
+  },
+  "devDependencies": {
+    "@google/clasp": "^3.3.0",
+    "@types/bun": "latest",
+    "@types/google-apps-script": "^2.0.9",
+    "gas-vite-plugin": "^0.0.4",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.14"
+  }
+}

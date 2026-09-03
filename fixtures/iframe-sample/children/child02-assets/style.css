@@ -1,0 +1,43 @@
+@import "./tokens.css";
+
+* { box-sizing: border-box; }
+
+:root {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background-color: #ecfdf5;
+  background-image: url("./pattern.svg");
+}
+
+body { margin: 0; padding: 24px; }
+
+.document-card {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 14px 30px rgba(6, 95, 70, .08);
+}
+
+.badge {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: var(--accent-dark);
+  background: var(--accent-pale);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+h1 { margin: 14px 0 8px; font-size: 25px; }
+.lead { margin: 0; color: var(--muted); line-height: 1.65; }
+
+figure { margin: 18px 0 14px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: white; }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { margin-top: 8px; color: var(--muted); font-size: 11px; text-align: center; }
+
+.asset-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.asset-list div { padding: 9px 10px; border-radius: 9px; background: var(--accent-pale); }
+.asset-list strong, .asset-list span { display: block; }
+.asset-list strong { color: var(--accent-dark); font-size: 12px; }
+.asset-list span { margin-top: 2px; color: var(--muted); font-size: 10px; }

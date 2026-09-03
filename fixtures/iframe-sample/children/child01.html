@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Child 01</title>
+  <style>
+    :root { font-family: ui-sans-serif, system-ui, sans-serif; color: #172554; background: #eff6ff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; }
+    .badge { display: inline-block; padding: 5px 9px; border-radius: 999px; color: #1d4ed8; background: #dbeafe; font-size: 11px; font-weight: 800; }
+    h1 { margin: 14px 0 8px; font-size: 25px; }
+    p { color: #475569; line-height: 1.65; }
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; overflow: hidden; border-radius: 10px; background: white; font-size: 13px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #dbeafe; text-align: left; }
+    th { color: #1e40af; background: #dbeafe; }
+    tr:last-child td { border-bottom: 0; }
+    details { margin-top: 18px; padding: 12px 14px; border: 1px solid #bfdbfe; border-radius: 10px; background: rgba(255, 255, 255, .72); }
+    summary { cursor: pointer; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <span class="badge">INLINE STYLE</span>
+  <h1>child01.html</h1>
+  <p>このカードは、CSSをHTML内に持つ単独の子ドキュメントです。</p>
+
+  <table>
+    <thead><tr><th>確認項目</th><th>期待値</th></tr></thead>
+    <tbody>
+      <tr><td>相対iframe</td><td>表示成功</td></tr>
+      <tr><td>インラインCSS</td><td>青い配色</td></tr>
+      <tr><td>HTML要素</td><td>表とdetails</td></tr>
+    </tbody>
+  </table>
+
+  <details>
+    <summary>details要素を開く</summary>
+    <p>JavaScriptを使わないブラウザ標準の操作は、sandbox内でも利用できます。</p>
+  </details>
+</body>
+</html>

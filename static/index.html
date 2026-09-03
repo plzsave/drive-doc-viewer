@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drive Doc Viewer</title>
+  <script>
+    try {
+      const savedTheme = localStorage.getItem("drive-doc-viewer-theme");
+      const useDark = savedTheme
+        ? savedTheme === "dark"
+        : window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.classList.toggle("dark", useDark);
+    } catch (_error) {
+      document.documentElement.classList.toggle("dark", window.matchMedia("(prefers-color-scheme: dark)").matches);
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@18.0.4/lib/marked.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.7/dist/purify.min.js"></script>
+  <link id="highlight-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css">
+  <link id="highlight-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css" disabled>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.15.0/+esm";
+    const theme = document.documentElement.classList.contains("dark") ? "dark" : "neutral";
+    mermaid.initialize({ startOnLoad: false, theme, securityLevel: "strict" });
+    window.mermaid = mermaid;
+    window.dispatchEvent(new Event("mermaid-ready"));
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #172033;
+      background: #f3f5f8;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .app-header {
+      height: 58px; padding: 0 24px; display: flex; align-items: center; gap: 12px;
+      background: #fff; border-bottom: 1px solid #dfe3ea; position: sticky; top: 0; z-index: 10;
+    }
+    .app-heading { min-width: 0; flex: 1; }
+    .logo { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: #2563eb; color: white; font-weight: 800; }
+    .app-title { font-size: 16px; font-weight: 700; }
+    .app-subtitle { color: #697386; font-size: 12px; }
+    .shell { width: min(1180px, calc(100% - 32px)); margin: 28px auto; }
+    .open-card {
+      background: #fff; border: 1px solid #dfe3ea; border-radius: 14px; padding: 22px;
+      box-shadow: 0 10px 28px rgba(31, 42, 68, .06);
+    }
+    .open-card.hidden { display: none; }
+    .open-card h1 { margin: 0 0 6px; font-size: 20px; }
+    .open-card p { margin: 0 0 18px; color: #697386; font-size: 14px; line-height: 1.6; }
+    .open-form { display: flex; gap: 10px; }
+    .url-input {
+      min-width: 0; flex: 1; border: 1px solid #cbd2dc; border-radius: 9px; padding: 11px 13px;
+      outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    .url-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, .12); }
+    .primary-button, .secondary-button {
+      border-radius: 9px; padding: 10px 16px; border: 1px solid transparent; font-weight: 650;
+    }
+    .primary-button { color: #fff; background: #2563eb; }
+    .primary-button:hover { background: #1d4ed8; }
+    .primary-button:disabled { opacity: .55; cursor: wait; }
+    .secondary-button { color: #344054; background: #fff; border-color: #cbd2dc; }
+    .secondary-button:hover { background: #f7f8fa; }
+    .header-button {
+      flex-shrink: 0; padding: 7px 11px; border: 1px solid #cbd2dc; border-radius: 8px;
+      color: #344054; background: #fff; font-size: 12px; font-weight: 650;
+    }
+    .header-button:hover { background: #f7f8fa; }
+    .hint { margin-top: 10px; color: #7b8496; font-size: 12px; }
+    .message { display: none; margin-top: 14px; border-radius: 9px; padding: 10px 12px; font-size: 13px; }
+    .message.visible { display: block; }
+    .message.loading { background: #eff6ff; color: #1d4ed8; }
+    .message.error { background: #fff1f2; color: #be123c; }
+    .message.warning { background: #fffbeb; color: #92400e; }
+    .viewer { display: none; margin-top: 18px; scroll-margin-top: 70px; background: #fff; border: 1px solid #dfe3ea; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 28px rgba(31, 42, 68, .06); }
+    .viewer.visible { display: block; }
+    .viewer-bar { min-height: 58px; padding: 10px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #e5e8ee; }
+    .file-meta { min-width: 0; flex: 1; }
+    .file-name { margin: 0; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-detail { margin-top: 3px; color: #7b8496; font-size: 11px; }
+    .type-badge { border-radius: 999px; padding: 3px 8px; color: #1e40af; background: #dbeafe; font-size: 11px; font-weight: 700; }
+    .viewer-body { min-height: 65vh; }
+    .markdown-body { padding: 34px clamp(22px, 5vw, 72px) 64px; max-width: 980px; margin: auto; line-height: 1.75; color: #24292f; }
+    .markdown-body h1, .markdown-body h2 { border-bottom: 1px solid #d8dee4; padding-bottom: .3em; }
+    .markdown-body h1 { margin-top: 0; font-size: 2em; }
+    .markdown-body h2 { margin-top: 1.7em; font-size: 1.5em; }
+    .markdown-body h3 { margin-top: 1.5em; }
+    .markdown-body pre { overflow: auto; padding: 16px; background: #f6f8fa; border-radius: 8px; }
+    .markdown-body code { padding: .18em .35em; border-radius: 4px; background: #eff1f3; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .markdown-body pre code { padding: 0; background: transparent; }
+    .markdown-body blockquote { margin-left: 0; padding-left: 1em; color: #59636e; border-left: 4px solid #d0d7de; }
+    .markdown-body table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+    .markdown-body th, .markdown-body td { border: 1px solid #d0d7de; padding: 7px 12px; }
+    .markdown-body th { background: #f6f8fa; }
+    .markdown-body img { max-width: 100%; height: auto; }
+    .markdown-body a { color: #0969da; }
+    .markdown-body .mermaid { margin: 1.5em 0; overflow-x: auto; text-align: center; }
+    .markdown-body .mermaid svg { max-width: 100%; height: auto; }
+    .mermaid-error { padding: 12px; border: 1px solid #fecaca; border-radius: 8px; color: #b91c1c; background: #fef2f2; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; text-align: left; white-space: pre-wrap; }
+    .html-preview { display: block; width: 100%; height: calc(100vh - 150px); height: calc(100dvh - 150px); min-height: 360px; border: 0; background: #fff; }
+    .empty { display: grid; place-items: center; min-height: 40vh; color: #7b8496; text-align: center; padding: 40px; }
+    .dark { color-scheme: dark; color: #e6edf3; background: #0d1117; }
+    .dark body { background: #0d1117; }
+    .dark .app-header, .dark .open-card, .dark .viewer { background: #161b22; border-color: #30363d; }
+    .dark .app-subtitle, .dark .open-card p, .dark .hint, .dark .file-detail { color: #8b949e; }
+    .dark .url-input { color: #e6edf3; background: #0d1117; border-color: #484f58; }
+    .dark .url-input::placeholder { color: #6e7681; }
+    .dark .url-input:focus { border-color: #58a6ff; box-shadow: 0 0 0 3px rgba(88, 166, 255, .15); }
+    .dark .secondary-button, .dark .header-button { color: #c9d1d9; background: #21262d; border-color: #484f58; }
+    .dark .secondary-button:hover, .dark .header-button:hover { background: #30363d; }
+    .dark .message.loading { color: #79c0ff; background: #0d2847; }
+    .dark .message.error { color: #ff7b72; background: #3d1418; }
+    .dark .message.warning { color: #e3b341; background: #352a12; }
+    .dark .viewer-bar { border-color: #30363d; }
+    .dark .type-badge { color: #79c0ff; background: #0d2847; }
+    .dark .markdown-body { color: #c9d1d9; }
+    .dark .markdown-body h1, .dark .markdown-body h2 { border-color: #30363d; }
+    .dark .markdown-body pre { background: #161b22; border: 1px solid #30363d; }
+    .dark .markdown-body code { color: #e6edf3; background: #21262d; }
+    .dark .markdown-body pre code { background: transparent; }
+    .dark .markdown-body blockquote { color: #8b949e; border-color: #3b434b; }
+    .dark .markdown-body th, .dark .markdown-body td { border-color: #30363d; }
+    .dark .markdown-body th { background: #161b22; }
+    .dark .markdown-body a { color: #58a6ff; }
+    .dark .mermaid-error { color: #ff7b72; background: #3d1418; border-color: #6e2d33; }
+    @media (max-width: 680px) {
+      .app-header { padding: 0 14px; }
+      .app-subtitle { display: none; }
+      .header-button { padding: 7px 9px; }
+      .theme-label { display: none; }
+      .shell { width: min(100% - 20px, 1180px); margin-top: 14px; }
+      .open-card { padding: 16px; }
+      .open-form { flex-direction: column; }
+      .viewer-bar { align-items: flex-start; flex-wrap: wrap; }
+      .file-meta { flex-basis: calc(100% - 80px); }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo">D</div>
+    <div class="app-heading">
+      <div class="app-title">Drive Doc Viewer</div>
+      <div class="app-subtitle">Google Drive上のMarkdown・HTMLを読みやすく表示</div>
+    </div>
+    <button id="theme-toggle" class="header-button" type="button" aria-label="ダークモードに切り替える" title="ダークモードに切り替える">
+      <span id="theme-icon" aria-hidden="true">☾</span>
+      <span id="theme-label" class="theme-label">ダーク</span>
+    </button>
+    <button id="open-panel-toggle" class="header-button" type="button" aria-controls="open-card" aria-expanded="true">入力欄を隠す</button>
+  </header>
+
+  <main class="shell">
+    <section id="open-card" class="open-card">
+      <h1>Driveファイルを開く</h1>
+      <p>閲覧権限のあるMarkdownまたはHTMLファイルの共有URLを貼り付けてください。</p>
+      <form id="open-form" class="open-form">
+        <input id="url-input" class="url-input" type="text" autocomplete="off" spellcheck="false"
+          placeholder="https://drive.google.com/file/d/…/view" aria-label="Google DriveファイルURL">
+        <button id="open-button" class="primary-button" type="submit">開く</button>
+      </form>
+      <div class="hint">ファイルIDだけでも開けます。ファイルは更新・保存されません。</div>
+      <div id="message" class="message" role="status"></div>
+    </section>
+
+    <section id="viewer" class="viewer" aria-live="polite">
+      <div class="viewer-bar">
+        <span id="type-badge" class="type-badge"></span>
+        <div class="file-meta">
+          <h2 id="file-name" class="file-name"></h2>
+          <div id="file-detail" class="file-detail"></div>
+        </div>
+        <button id="copy-link" class="secondary-button" type="button">共有URLをコピー</button>
+        <button id="close-viewer" class="secondary-button" type="button">閉じる</button>
+      </div>
+      <div id="viewer-body" class="viewer-body"></div>
+    </section>
+  </main>
+
+  <script>
+    window.__INITIAL_REQUEST__ = <?!= initialRequestJson ?>;
+  </script>
+  <!--CLIENT_JS-->
+</body>
+</html>

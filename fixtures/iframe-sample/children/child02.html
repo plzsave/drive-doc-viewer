@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Child 02</title>
+  <link rel="stylesheet" href="child02-assets/style.css">
+</head>
+<body>
+  <article class="document-card">
+    <span class="badge">EXTERNAL ASSETS</span>
+    <h1>child02.html</h1>
+    <p class="lead">
+      このカードは外部CSSを読み込み、そのCSSからさらにトークン定義と背景SVGを参照しています。
+    </p>
+
+    <figure>
+      <img src="child02-assets/diagram.svg" alt="HTML関連ファイルの読み込みフロー">
+      <figcaption>HTML内の相対パスで読み込んだSVG</figcaption>
+    </figure>
+
+    <div class="asset-list">
+      <div><strong>style.css</strong><span>HTMLから参照</span></div>
+      <div><strong>tokens.css</strong><span>CSSの @import</span></div>
+      <div><strong>pattern.svg</strong><span>CSSの url()</span></div>
+      <div><strong>diagram.svg</strong><span>HTMLの img</span></div>
+    </div>
+  </article>
+</body>
+</html>

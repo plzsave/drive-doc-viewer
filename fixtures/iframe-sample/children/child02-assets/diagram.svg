@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="170" viewBox="0 0 620 170" role="img" aria-labelledby="title desc">
+  <title id="title">HTML関連ファイルの読み込みフロー</title>
+  <desc id="desc">main.htmlからchild02.htmlを経由してCSSとSVGを読み込む流れ</desc>
+  <defs>
+    <linearGradient id="card" x1="0" x2="1">
+      <stop offset="0" stop-color="#ecfdf5"/>
+      <stop offset="1" stop-color="#d1fae5"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#059669"/>
+    </marker>
+  </defs>
+  <rect width="620" height="170" rx="14" fill="#ffffff"/>
+  <g font-family="ui-sans-serif,system-ui,sans-serif" text-anchor="middle">
+    <g transform="translate(18 45)">
+      <rect width="150" height="78" rx="12" fill="url(#card)" stroke="#6ee7b7"/>
+      <text x="75" y="35" fill="#065f46" font-size="15" font-weight="700">main.html</text>
+      <text x="75" y="56" fill="#64748b" font-size="11">iframe src</text>
+    </g>
+    <g transform="translate(235 45)">
+      <rect width="150" height="78" rx="12" fill="url(#card)" stroke="#6ee7b7"/>
+      <text x="75" y="35" fill="#065f46" font-size="15" font-weight="700">child02.html</text>
+      <text x="75" y="56" fill="#64748b" font-size="11">link / img</text>
+    </g>
+    <g transform="translate(452 24)">
+      <rect width="150" height="55" rx="12" fill="url(#card)" stroke="#6ee7b7"/>
+      <text x="75" y="26" fill="#065f46" font-size="14" font-weight="700">style.css</text>
+      <text x="75" y="43" fill="#64748b" font-size="10">@import / url()</text>
+    </g>
+    <g transform="translate(452 96)">
+      <rect width="150" height="50" rx="12" fill="url(#card)" stroke="#6ee7b7"/>
+      <text x="75" y="30" fill="#065f46" font-size="14" font-weight="700">diagram.svg</text>
+    </g>
+  </g>
+  <g fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#arrow)">
+    <path d="M168 84H228"/>
+    <path d="M385 72C414 72 419 52 445 52"/>
+    <path d="M385 96C414 96 419 121 445 121"/>
+  </g>
+</svg>
